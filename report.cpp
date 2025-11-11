@@ -29,8 +29,7 @@ extern "C" void CreateReport(Value& req, Value& res,  Document::AllocatorType& a
     std::vector<TradeRecord> trades;
     int ret = server->GetAllOpenTrades( &trades);
 
-    // Пример исходных данных
-    struct DayData { std::string day; double usage; double peak; };
+    struct DayData { std::string day; double commission; double profit; };
     std::vector<DayData> data = {
         {"Mon", 120.5, 80.2},
         {"Tue", 150.3, 95.6},
@@ -39,7 +38,7 @@ extern "C" void CreateReport(Value& req, Value& res,  Document::AllocatorType& a
         {"Fri", 160.8, 102.4}
     };
 
-    // ---------- График (Recharts LineChart) ----------
+    // ---------- (Recharts LineChart) ----------
     Node chart = ResponsiveContainer({
         LineChart({
             XAxis({}, props({{"dataKey", "day"}})),
@@ -48,12 +47,12 @@ extern "C" void CreateReport(Value& req, Value& res,  Document::AllocatorType& a
             Legend(),
             Line({}, props({
                 {"type", "monotone"},
-                {"dataKey", "usage"},
+                {"dataKey", "commission"},
                 {"stroke", "#8884d8"}
             })),
             Line({}, props({
                 {"type", "monotone"},
-                {"dataKey", "peak"},
+                {"dataKey", "profit"},
                 {"stroke", "#82ca9d"}
             }))
         }, props({
@@ -69,29 +68,29 @@ extern "C" void CreateReport(Value& req, Value& res,  Document::AllocatorType& a
     for (const auto& d : data) {
         jsonData.push_back(JSONObject{
             {"day", d.day},
-            {"usage", d.usage},
-            {"peak", d.peak}
+            {"commission", d.commission},
+            {"profit", d.profit}
         });
     }
     chart.children[0].props["data"] = JSONValue(jsonData);
 
-    // ---------- Таблица (с генерацией через лямбду) ----------
+    // ---------- Table ----------
     auto makeTable = [&](const std::vector<DayData>& rows) -> Node {
         std::vector<Node> tableRows;
 
         // Заголовок
         tableRows.push_back(tr({
             th({ text("Day") }),
-            th({ text("Usage (kWh)") }),
-            th({ text("Peak Load (kW)") })
+            th({ text("Commission") }),
+            th({ text("P/L") })
         }));
 
         // Динамические строки (через лямбду)
         for (const auto& row : rows) {
             tableRows.push_back(tr({
                 td({ text(row.day) }),
-                td({ text(std::to_string(row.usage)) }),
-                td({ text(std::to_string(row.peak)) })
+                td({ text(std::to_string(row.commission)) }),
+                td({ text(std::to_string(row.profit)) })
             }));
         }
 
@@ -99,82 +98,13 @@ extern "C" void CreateReport(Value& req, Value& res,  Document::AllocatorType& a
     };
 
     Node report = div({
-        h1({ text("Weekly Energy Report") }),
+        h1({ text("Profit and Commission Report") }),
         chart,
         makeTable(data)
     }, props({{"className", "report"}}));
+
 
     to_json(report, res, aloc);
 }
 
 
-// ---------- basic HTML tags ----------
-
-TAG(div)
-TAG(span)
-TAG(p)
-TAG(h1)
-TAG(h2)
-TAG(h3)
-TAG(h4)
-TAG(h5)
-TAG(h6)
-TAG(ul)
-TAG(ol)
-TAG(li)
-TAG(table)
-TAG(thead)
-TAG(tbody)
-TAG(tr)
-TAG(td)
-TAG(th)
-TAG(img)
-TAG(a)
-TAG(button)
-TAG(input)
-TAG(label)
-TAG(form)
-TAG(select)
-TAG(option)
-TAG(section)
-TAG(article)
-TAG(header)
-TAG(footer)
-TAG(main)
-TAG(nav)
-TAG(svg)
-TAG(path)
-TAG(rect)
-TAG(circle)
-TAG(line)
-TAG(g)
-
-// ---------- Recharts tags ----------
-
-TAG(ResponsiveContainer)
-TAG(LineChart)
-TAG(BarChart)
-TAG(PieChart)
-TAG(AreaChart)
-TAG(XAxis)
-TAG(YAxis)
-TAG(ZAxis)
-TAG(Tooltip)
-TAG(Legend)
-TAG(Line)
-TAG(Bar)
-TAG(Pie)
-TAG(Area)
-TAG(Cell)
-TAG(CartesianGrid)
-TAG(Brush)
-TAG(ReferenceLine)
-TAG(ReferenceDot)
-TAG(ComposedChart)
-TAG(ScatterChart)
-TAG(Scatter)
-TAG(RadarChart)
-TAG(Radar)
-TAG(PolarGrid)
-TAG(PolarAngleAxis)
-TAG(PolarRadiusAxis)
