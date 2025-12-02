@@ -1,2 +1,2 @@
-# demo-report
-Example report module
+# report-demo
+
