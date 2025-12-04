@@ -661,6 +661,7 @@ struct EquityRecord {
     std::string group;
     int leverage;
     double balance = 0.0;
+    double prevbalance = 0.0;
     double credit = 0.0;
     double equity = 0.0;
     double profit = 0.0;

@@ -20,16 +20,6 @@ extern "C" void CreateReport(rapidjson::Value& request,
                              rapidjson::Value& response,
                              rapidjson::Document::AllocatorType& allocator,
                              CServerInterface* server) {
-    // Структура накопления итогов
-    struct Total {
-        double volume;
-        double commission;
-        double profit;
-        std::string currency;
-    };
-
-    std::unordered_map<std::string, Total> totals_map;
-
     std::string group_mask;
     int from;
     int to;
@@ -44,23 +34,41 @@ extern "C" void CreateReport(rapidjson::Value& request,
     }
 
     std::vector<TradeRecord> trades_vector;
-    std::vector<GroupRecord> groups_vector;
 
     try {
         server->GetCloseTradesByGroup(group_mask, from, to, &trades_vector);
-        server->GetAllGroups(&groups_vector);
     } catch (const std::exception& e) {
         std::cerr << "[TradesHistoryReportInterface]: " << e.what() << std::endl;
     }
 
     JSONObject id_column_props = {
         {"name", JSONValue("ID")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}}
+        {"filter", JSONObject{{"type", JSONValue("search")}}},
+        {"export", JSONValue(true)}
+    };
+
+    JSONObject login_column_pros = {
+        {"name", JSONValue("LOGIN")},
+        {"filter", JSONObject{{"type", JSONValue("search")}}},
+        {"export", JSONValue(true)}
     };
 
     JSONObject order_column_props = {
         {"name", JSONValue("ORDER")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}}
+        {"filter", JSONObject{{"type", JSONValue("search")}}},
+        {"export", JSONValue(true)}
+    };
+
+    JSONObject open_time_column_props = {
+        {"name", JSONValue("OPEN_TIME")},
+        {"filter", JSONObject{{"type", JSONValue("search")}}},
+        {"export", JSONValue(true)}
+    };
+
+    JSONObject close_time_column_props = {
+        {"name", JSONValue("CLOSE_TIME")},
+        {"filter", JSONObject{{"type", JSONValue("search")}}},
+        {"export", JSONValue(true)}
     };
 
     JSONArray table_data;
@@ -69,12 +77,15 @@ extern "C" void CreateReport(rapidjson::Value& request,
 
         table_data.emplace_back(JSONObject{
             {"id", JSONValue(std::to_string(i))},
-            {"order", JSONValue(std::to_string(trade.order))}
+            {"login", JSONValue(std::to_string(trade.login))},
+            {"order", JSONValue(std::to_string(trade.order))},
+            {"open_time", JSONValue(utils::FormatTimestampToString(trade.open_time))},
+            {"close_time", JSONValue(utils::FormatTimestampToString(trade.close_time))},
         });
     }
 
     JSONObject table_props = props({
-        {"name", "MarginCallTable"},
+        {"name", "DemoReport"},
         {"idCol", "id"},
         {"data", table_data},
         {"orderBy", JSONArray{JSONValue("id"), JSONValue("DESC")}},
@@ -84,12 +95,12 @@ extern "C" void CreateReport(rapidjson::Value& request,
         }}
     });
 
-    Node table = Table({}, table_props);
+    Node table_node = Table({}, table_props);
 
     // Total report
     const Node report = div({
         h1({text("Trades History Report")}),
-        table
+        table_node
     });
 
     utils::CreateUI(report, response, allocator);
