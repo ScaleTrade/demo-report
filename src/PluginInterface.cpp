@@ -89,10 +89,11 @@ extern "C" void CreateReport(rapidjson::Value& request,
         {"idCol", "id"},
         {"data", table_data},
         {"orderBy", JSONArray{JSONValue("id"), JSONValue("DESC")}},
+        {"showExportBtn", JSONValue(true)},
         {"structure", JSONObject{
             {"id", JSONValue(id_column_props)},
             {"order", JSONValue(order_column_props)}
-        }}
+        }},
     });
 
     Node table_node = Table({}, table_props);
