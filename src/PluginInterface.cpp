@@ -92,7 +92,10 @@ extern "C" void CreateReport(rapidjson::Value& request,
         {"showExportBtn", JSONValue(true)},
         {"structure", JSONObject{
             {"id", JSONValue(id_column_props)},
-            {"order", JSONValue(order_column_props)}
+            {"login", (JSONValue(login_column_pros))},
+            {"order", JSONValue(order_column_props)},
+            {"open_time", JSONValue(open_time_column_props)},
+            {"close_time", JSONValue(close_time_column_props)}
         }},
     });
 
