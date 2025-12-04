@@ -41,59 +41,85 @@ extern "C" void CreateReport(rapidjson::Value& request,
         std::cerr << "[TradesHistoryReportInterface]: " << e.what() << std::endl;
     }
 
-    JSONObject order_column_props = {
-        {"name", JSONValue("ORDER")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)},
-        {"sort", JSONValue(true)}
-    };
+    // v.1
+    // JSONObject order_column_props = {
+    //     {"name", JSONValue("ORDER")},
+    //     {"filter", JSONObject{{"type", JSONValue("search")}}},
+    //     {"export", JSONValue(true)},
+    //     {"sort", JSONValue(true)}
+    // };
+    //
+    // JSONObject login_column_pros = {
+    //     {"name", JSONValue("LOGIN")},
+    //     {"filter", JSONObject{{"type", JSONValue("search")}}},
+    //     {"export", JSONValue(true)},
+    //     {"sort", JSONValue(true)}
+    // };
+    //
+    // JSONObject open_time_column_props = {
+    //     {"name", JSONValue("OPEN_TIME")},
+    //     {"filter", JSONObject{{"type", JSONValue("search")}}},
+    //     {"export", JSONValue(true)},
+    //     {"sort", JSONValue(true)}
+    // };
+    //
+    // JSONObject close_time_column_props = {
+    //     {"name", JSONValue("CLOSE_TIME")},
+    //     {"filter", JSONObject{{"type", JSONValue("search")}}},
+    //     {"export", JSONValue(true)},
+    //     {"sort", JSONValue(true)}
+    // };
+    //
+    // JSONArray table_data;
+    // for (const auto& trade : trades_vector) {
+    //     table_data.emplace_back(JSONObject{
+    //     {"order", JSONValue(std::to_string(trade.order))},
+    //     {"login", JSONValue(std::to_string(trade.login))},
+    //     {"open_time", JSONValue(utils::FormatTimestampToString(trade.open_time))},
+    //     {"close_time", JSONValue(utils::FormatTimestampToString(trade.close_time))},
+    //     });
+    // }
+    //
+    // JSONObject table_props = props({
+    //     {"name", "DemoReport"},
+    //     {"idCol", "order"},
+    //     {"data", table_data},
+    //     {"orderBy", JSONArray{JSONValue("order"), JSONValue("DESC")}},
+    //     {"showExportBtn", JSONValue(true)},
+    //     {"showRefreshBtn", JSONValue(false)},
+    //     {"showBookmarksBtn", JSONValue(false)},
+    //     {"structure", JSONObject{
+    //         {"login", (JSONValue(login_column_pros))},
+    //         {"order", JSONValue(order_column_props)},
+    //         {"open_time", JSONValue(open_time_column_props)},
+    //         {"close_time", JSONValue(close_time_column_props)}
+    //     }},
+    // });
 
-    JSONObject login_column_pros = {
-        {"name", JSONValue("LOGIN")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)},
-        {"sort", JSONValue(true)}
-    };
+    // v.2
+    TableBuilder table_builder("Demo Report");
 
-    JSONObject open_time_column_props = {
-        {"name", JSONValue("OPEN_TIME")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)},
-        {"sort", JSONValue(true)}
-    };
+    table_builder.SetIdColumn("order");
+    table_builder.SetOrderBy("order", "DESC");
+    table_builder.EnableRefreshButton(false);
+    table_builder.EnableBookmarksButton(false);
+    table_builder.EnableExportButton(true);
 
-    JSONObject close_time_column_props = {
-        {"name", JSONValue("CLOSE_TIME")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)},
-        {"sort", JSONValue(true)}
-    };
+    table_builder.AddColumn({"order", "ORDER"});
+    table_builder.AddColumn({"login", "LOGIN"});
+    table_builder.AddColumn({"open_time", "OPEN_TIME"});
+    table_builder.AddColumn({"close_time", "CLOSE_TIME"});
 
-    JSONArray table_data;
     for (const auto& trade : trades_vector) {
-        table_data.emplace_back(JSONObject{
-        {"order", JSONValue(std::to_string(trade.order))},
-        {"login", JSONValue(std::to_string(trade.login))},
-        {"open_time", JSONValue(utils::FormatTimestampToString(trade.open_time))},
-        {"close_time", JSONValue(utils::FormatTimestampToString(trade.close_time))},
+        table_builder.AddRow({
+            {"order", std::to_string(trade.order)},
+            {"login", std::to_string(trade.login)},
+            {"open_time", utils::FormatTimestampToString(trade.open_time)},
+            {"close_time", utils::FormatTimestampToString(trade.close_time)}
         });
     }
 
-    JSONObject table_props = props({
-        {"name", "DemoReport"},
-        {"idCol", "order"},
-        {"data", table_data},
-        {"orderBy", JSONArray{JSONValue("order"), JSONValue("DESC")}},
-        {"showExportBtn", JSONValue(true)},
-        {"showRefreshBtn", JSONValue(false)},
-        {"showBookmarksBtn", JSONValue(false)},
-        {"structure", JSONObject{
-            {"login", (JSONValue(login_column_pros))},
-            {"order", JSONValue(order_column_props)},
-            {"open_time", JSONValue(open_time_column_props)},
-            {"close_time", JSONValue(close_time_column_props)}
-        }},
-    });
+    const JSONObject table_props = table_builder.CreateTableProps();
 
     Node table_node = Table({}, table_props);
 
