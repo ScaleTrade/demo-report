@@ -41,8 +41,8 @@ extern "C" void CreateReport(rapidjson::Value& request,
         std::cerr << "[TradesHistoryReportInterface]: " << e.what() << std::endl;
     }
 
-    JSONObject id_column_props = {
-        {"name", JSONValue("ID")},
+    JSONObject order_column_props = {
+        {"name", JSONValue("ORDER")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
         {"export", JSONValue(true)},
         {"sort", JSONValue(true)}
@@ -50,13 +50,6 @@ extern "C" void CreateReport(rapidjson::Value& request,
 
     JSONObject login_column_pros = {
         {"name", JSONValue("LOGIN")},
-        {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)},
-        {"sort", JSONValue(true)}
-    };
-
-    JSONObject order_column_props = {
-        {"name", JSONValue("ORDER")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
         {"export", JSONValue(true)},
         {"sort", JSONValue(true)}
@@ -77,28 +70,24 @@ extern "C" void CreateReport(rapidjson::Value& request,
     };
 
     JSONArray table_data;
-    for (size_t i = 0; i < trades_vector.size(); i++) {
-        const auto& trade = trades_vector[i];
-
+    for (const auto& trade : trades_vector) {
         table_data.emplace_back(JSONObject{
-            {"id", JSONValue(std::to_string(i))},
-            {"login", JSONValue(std::to_string(trade.login))},
-            {"order", JSONValue(std::to_string(trade.order))},
-            {"open_time", JSONValue(utils::FormatTimestampToString(trade.open_time))},
-            {"close_time", JSONValue(utils::FormatTimestampToString(trade.close_time))},
+        {"order", JSONValue(std::to_string(trade.order))},
+        {"login", JSONValue(std::to_string(trade.login))},
+        {"open_time", JSONValue(utils::FormatTimestampToString(trade.open_time))},
+        {"close_time", JSONValue(utils::FormatTimestampToString(trade.close_time))},
         });
     }
 
     JSONObject table_props = props({
         {"name", "DemoReport"},
-        {"idCol", "id"},
+        {"idCol", "order"},
         {"data", table_data},
-        {"orderBy", JSONArray{JSONValue("id"), JSONValue("DESC")}},
+        {"orderBy", JSONArray{JSONValue("order"), JSONValue("DESC")}},
         {"showExportBtn", JSONValue(true)},
         {"showRefreshBtn", JSONValue(false)},
         {"showBookmarksBtn", JSONValue(false)},
         {"structure", JSONObject{
-            {"id", JSONValue(id_column_props)},
             {"login", (JSONValue(login_column_pros))},
             {"order", JSONValue(order_column_props)},
             {"open_time", JSONValue(open_time_column_props)},
