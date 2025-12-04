@@ -44,31 +44,36 @@ extern "C" void CreateReport(rapidjson::Value& request,
     JSONObject id_column_props = {
         {"name", JSONValue("ID")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)}
+        {"export", JSONValue(true)},
+        {"sort", JSONValue(true)}
     };
 
     JSONObject login_column_pros = {
         {"name", JSONValue("LOGIN")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)}
+        {"export", JSONValue(true)},
+        {"sort", JSONValue(true)}
     };
 
     JSONObject order_column_props = {
         {"name", JSONValue("ORDER")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)}
+        {"export", JSONValue(true)},
+        {"sort", JSONValue(true)}
     };
 
     JSONObject open_time_column_props = {
         {"name", JSONValue("OPEN_TIME")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)}
+        {"export", JSONValue(true)},
+        {"sort", JSONValue(true)}
     };
 
     JSONObject close_time_column_props = {
         {"name", JSONValue("CLOSE_TIME")},
         {"filter", JSONObject{{"type", JSONValue("search")}}},
-        {"export", JSONValue(true)}
+        {"export", JSONValue(true)},
+        {"sort", JSONValue(true)}
     };
 
     JSONArray table_data;
@@ -90,6 +95,8 @@ extern "C" void CreateReport(rapidjson::Value& request,
         {"data", table_data},
         {"orderBy", JSONArray{JSONValue("id"), JSONValue("DESC")}},
         {"showExportBtn", JSONValue(true)},
+        {"showRefreshBtn", JSONValue(false)},
+        {"showBookmarksBtn", JSONValue(false)},
         {"structure", JSONObject{
             {"id", JSONValue(id_column_props)},
             {"login", (JSONValue(login_column_pros))},
