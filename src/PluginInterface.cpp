@@ -64,8 +64,7 @@ extern "C" void CreateReport(rapidjson::Value& request,
     }
 
     const JSONObject table_props = table_builder.CreateTableProps();
-
-    Node table_node = Table({}, table_props);
+    const Node table_node = Table({}, table_props);
 
     // Total report
     const Node report = div({
