@@ -41,7 +41,7 @@ extern "C" void CreateReport(rapidjson::Value& request,
         std::cerr << "[DemoReportInterface]: " << e.what() << std::endl;
     }
 
-    TableBuilder table_builder("DemoReport");
+    TableBuilder table_builder("DemoReportTable");
 
     table_builder.SetIdColumn("order");
     table_builder.SetOrderBy("order", "DESC");
